@@ -1,10 +1,8 @@
 var spark = require('spark'),
-	require('toggl-api'),
+	TogglClient = require('toggl-api'),
 	toggl = new TogglClient({apiToken: '4f1c38ba5dd89b7cadf6eec2fc28fa74'}),
 	_ = require('underscore'),
 	currentParticle;
-
-app.use(bodyParser.json());
 
 initParticle();
 
@@ -23,13 +21,42 @@ function initParticle() {
 			currentParticle.onEvent('buttonPressed', function() {
 				console.log('Button was pressed!');
 
-        var currentEntry = toggl.getCurrentTimeEntry();
+        toggl.getCurrentTimeEntry(function(err, currentEntry) {
+          if (currentEntry) {
+            console.log(currentEntry.description + ' is running');
 
-				toggl.startTimeEntry({
+            toggl.stopTimeEntry(currentEntry.id, function(err, stoppedEntry) {
+              console.log(stoppedEntry.description + ' was stopped');
+            });
+          } else {
+            var currentDate = new Date(),
+                yesterday = new Date();
+
+            yesterday.setDate(currentDate.getDate() - 1);
+            
+            toggl.getTimeEntries(yesterday.toISOString(), currentDate.toISOString(), function(err, data) {
+              if (!err) {
+                var lastEntry = data[data.length - 1];
+                console.log(lastEntry);
+                //console.log(err, data);
+
+                toggl.startTimeEntry({
+                  description: lastEntry.description,
+                  pid: lastEntry.pid,
+                  wid: lastEntry.wid
+                }, function(err, timeEntry) {
+                  console.log('Entry started');
+                });
+              }
+            });
+          }
+        });
+
+				/*toggl.startTimeEntry({
           description: 'Button Event'
         }, function(err, timeEntry) {
           console.log('Entry started');
-        })
+        })*/
 			});
 		});
 	});
