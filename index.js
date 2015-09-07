@@ -1,6 +1,6 @@
 var spark = require("spark"),
 	TogglClient = require("toggl-api"),
-	toggl = new TogglClient({apiToken: "4f1c38ba5dd89b7cadf6eec2fc28fa74"}),
+	toggl = new TogglClient({apiToken: "YOURAPITOKEN"}),
 	_ = require("underscore"),
 	currentParticle;
 
@@ -63,7 +63,7 @@ function initParticle() {
 	});
 
 	spark.login({
-		accessToken: "9c0f99363411f0fd2c650ce1bbd8c0a5a3d4cd2e"
+		accessToken: "YOURSPARKTOKEN"
 	}, function(err, body) {
 		if (!err) console.log("API login complete!");
 	});
